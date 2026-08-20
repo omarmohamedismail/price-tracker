@@ -1,0 +1,29 @@
+name: Price Check
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # كل ساعة بالظبط
+  workflow_dispatch:        # يخليك تشغله يدوي من GitHub لو عايز تجربه فوراً
+
+jobs:
+  check-price:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Run price check
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python price_check.py
