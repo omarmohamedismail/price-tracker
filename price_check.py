@@ -1,10 +1,12 @@
 from playwright.sync_api import sync_playwright
 import re
 import requests
+import os
 
-TARGET_PRICE = 99999  # سيبها كده مؤقتاً للتجربة، بعد كده رجعها 5100
-TELEGRAM_TOKEN = "8747840328:AAG8YWIodfk9CyCIRv7n1yotPg1lCkPAbpA"
-CHAT_ID = "5241219849"
+TARGET_PRICE = 9999
+TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID = os.environ["CHAT_ID"]
+PRODUCT_URL = "https://a.co/d/0gEox93f"
 
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -12,12 +14,9 @@ def send_telegram_message(text):
     print("رد تليجرام:", response.status_code, response.text)
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(
-        headless=False,
-        executable_path=r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
-    )
+    browser = p.chromium.launch(headless=True)
     page = browser.new_page()
-    page.goto("https://a.co/d/0gEox93f")
+    page.goto(PRODUCT_URL)
     
     page.wait_for_timeout(3000)
     
@@ -33,7 +32,7 @@ with sync_playwright() as p:
         print("السعر المستهدف:", TARGET_PRICE)
         
         if current_price <= TARGET_PRICE:
-            message = f"🎉 السعر نزل!\nالسعر الحالي: {current_price}\nالرابط: https://a.co/d/0gEox93f"
+            message = f"🎉 السعر نزل!\nالسعر الحالي: {current_price}\nالرابط: {PRODUCT_URL}"
             send_telegram_message(message)
         else:
             print("لسه السعر أعلى من اللي انت عايزه، هنراقب.")
@@ -41,5 +40,4 @@ with sync_playwright() as p:
     except Exception as e:
         print("معرفتش أقرا السعر، السبب:", e)
     
-    page.wait_for_timeout(5000)
     browser.close()
