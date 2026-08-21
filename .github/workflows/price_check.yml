@@ -1,13 +1,12 @@
 name: Price Check
 
 on:
-  schedule:
-    - cron: '0 * * * *'   # كل ساعة بالظبط
-  workflow_dispatch:        # يخليك تشغله يدوي من GitHub لو عايز تجربه فوراً
+  workflow_dispatch:
 
 jobs:
   check-price:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +21,7 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps chromium
 
-      - name: Run price check
+      - name: Run bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
